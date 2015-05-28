@@ -1,5 +1,5 @@
 <?php
-namespace Crossjoin\Css\Format\Selector;
+namespace Crossjoin\Css\Format\Rule\AtKeyframes;
 
 use Crossjoin\Css\Format\Rule\SelectorAbstract;
 use Crossjoin\Css\Format\StyleSheet\StyleSheet;

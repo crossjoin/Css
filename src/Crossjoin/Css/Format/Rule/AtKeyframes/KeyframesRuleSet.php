@@ -4,7 +4,6 @@ namespace Crossjoin\Css\Format\Rule\AtKeyframes;
 use Crossjoin\Css\Format\Rule\DeclarationAbstract;
 use Crossjoin\Css\Format\Rule\RuleAbstract;
 use Crossjoin\Css\Format\Rule\TraitDeclarations;
-use Crossjoin\Css\Format\Selector\KeyframesKeyframe;
 use Crossjoin\Css\Format\StyleSheet\StyleSheet;
 use Crossjoin\Css\Helper\Placeholder;
 
