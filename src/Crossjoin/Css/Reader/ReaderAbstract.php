@@ -326,7 +326,6 @@ abstract class ReaderAbstract
                             $ruleCount--;
                         }
                     } else {
-                        if ($char === "@") {
                         // Start new at-rule, but only if we are not in brackets, which still can occur, although we
                         // replaced all strings, e.g. in this case: "background: url(/images/myimage-@1x.png)".
                         if ($char === "@" && $inBrackets === false) {
