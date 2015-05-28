@@ -1,6 +1,7 @@
 <?php
 namespace Crossjoin\Css\Format\Rule\Style;
 
+use Crossjoin\Css\Format\Rule\DeclarationAbstract;
 use Crossjoin\Css\Format\Rule\RuleAbstract;
 use Crossjoin\Css\Format\Rule\RuleGroupableInterface;
 use Crossjoin\Css\Format\Rule\TraitDeclarations;
@@ -75,9 +76,21 @@ implements RuleGroupableInterface
         return $this->selectors;
     }
 
-    public function addDeclaration(StyleDeclaration $declaration)
+    /**
+     * Adds a declaration to the rule.
+     *
+     * @param StyleDeclaration $declaration
+     * @return $this
+     */
+    public function addDeclaration(DeclarationAbstract $declaration)
     {
-        $this->declarations[] = $declaration;
+        if ($declaration instanceof StyleDeclaration) {
+            $this->declarations[] = $declaration;
+        } else {
+            throw new \InvalidArgumentException(
+                "Invalid declaration instance. Instance of 'StyleDeclaration' expected."
+            );
+        }
 
         return $this;
     }

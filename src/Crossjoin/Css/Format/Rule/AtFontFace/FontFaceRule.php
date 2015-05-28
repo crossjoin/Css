@@ -2,6 +2,7 @@
 namespace Crossjoin\Css\Format\Rule\AtFontFace;
 
 use Crossjoin\Css\Format\Rule\AtRuleAbstract;
+use Crossjoin\Css\Format\Rule\DeclarationAbstract;
 use Crossjoin\Css\Format\Rule\TraitDeclarations;
 use Crossjoin\Css\Format\StyleSheet\StyleSheet;
 
@@ -32,9 +33,15 @@ extends AtRuleAbstract
      * @param FontFaceDeclaration $declaration
      * @return $this
      */
-    public function addDeclaration(FontFaceDeclaration $declaration)
+    public function addDeclaration(DeclarationAbstract $declaration)
     {
-        $this->declarations[] = $declaration;
+        if ($declaration instanceof FontFaceDeclaration) {
+            $this->declarations[] = $declaration;
+        } else {
+            throw new \InvalidArgumentException(
+                "Invalid declaration instance. Instance of 'FontFaceDeclaration' expected."
+            );
+        }
 
         return $this;
     }

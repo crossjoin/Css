@@ -13,11 +13,21 @@ extends SelectorAbstract
     const SELECTOR_RIGHT = ':right';
     const SELECTOR_BLANK = ':blank';
 
+    /**
+     * @param string $value
+     * @param StyleSheet|null $styleSheet
+     */
     public function __construct($value, StyleSheet $styleSheet = null)
     {
         parent::__construct($value, $styleSheet);
     }
 
+    /**
+     * Checks the selector value.
+     *
+     * @param string $value
+     * @return bool
+     */
     public function checkValue(&$value)
     {
         if (parent::checkValue($value) === true) {

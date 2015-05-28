@@ -2,6 +2,7 @@
 namespace Crossjoin\Css\Format\Rule\AtSupports;
 
 use Crossjoin\Css\Format\Rule\AtRuleConditionalAbstract;
+use Crossjoin\Css\Format\Rule\ConditionAbstract;
 use Crossjoin\Css\Format\Rule\TraitConditions;
 use Crossjoin\Css\Format\StyleSheet\StyleSheet;
 use Crossjoin\Css\Helper\Condition;
@@ -34,9 +35,15 @@ extends AtRuleConditionalAbstract
      * @param SupportsCondition $condition
      * @return $this
      */
-    public function addCondition(SupportsCondition $condition)
+    public function addCondition(ConditionAbstract $condition)
     {
-        $this->conditions[] = $condition;
+        if ($condition instanceof SupportsCondition) {
+            $this->conditions[] = $condition;
+        } else {
+            throw new \InvalidArgumentException(
+                "Invalid condition instance. Instance of 'SupportsCondition' expected."
+            );
+        }
 
         return $this;
     }

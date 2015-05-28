@@ -3,6 +3,7 @@ namespace Crossjoin\Css\Format\Rule\AtKeyframes;
 
 use Crossjoin\Css\Format\Rule\AtRuleAbstract;
 use Crossjoin\Css\Format\Rule\HasRulesInterface;
+use Crossjoin\Css\Format\Rule\RuleAbstract;
 use Crossjoin\Css\Format\Rule\TraitRules;
 use Crossjoin\Css\Format\StyleSheet\StyleSheet;
 use Crossjoin\Css\Helper\Placeholder;
@@ -66,13 +67,19 @@ implements HasRulesInterface
      * @param KeyframesRuleSet $rule
      * @return $this
      */
-    public function addRule(KeyframesRuleSet $rule)
+    public function addRule(RuleAbstract $rule)
     {
         // TODO Keyframes with duplicate identifiers do NOT cascade!
         // Last one overwrites previous ones.
         // @see https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes#Duplicate_resolution
 
-        $this->rules[] = $rule;
+        if ($rule instanceof KeyframesRuleSet) {
+            $this->rules[] = $rule;
+        } else {
+            throw new \InvalidArgumentException(
+                "Invalid rule instance. Instance of 'KeyframesRuleSet' expected."
+            );
+        }
 
         return $this;
     }

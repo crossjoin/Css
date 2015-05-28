@@ -1,6 +1,7 @@
 <?php
 namespace Crossjoin\Css\Format\Rule\AtMedia;
 
+use Crossjoin\Css\Format\Rule\ConditionAbstract;
 use Crossjoin\Css\Format\Rule\TraitConditions;
 
 class MediaQuery
@@ -88,9 +89,15 @@ class MediaQuery
      * @param MediaCondition $condition
      * @return $this
      */
-    public function addCondition(MediaCondition $condition)
+    public function addCondition(ConditionAbstract $condition)
     {
-        $this->conditions[] = $condition;
+        if ($condition instanceof MediaCondition) {
+            $this->conditions[] = $condition;
+        } else {
+            throw new \InvalidArgumentException(
+                "Invalid condition instance. Instance of 'MediaCondition' expected."
+            );
+        }
 
         return $this;
     }

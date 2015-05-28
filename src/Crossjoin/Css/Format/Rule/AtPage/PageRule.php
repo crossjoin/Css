@@ -2,7 +2,6 @@
 namespace Crossjoin\Css\Format\Rule\AtPage;
 
 use Crossjoin\Css\Format\Rule\DeclarationAbstract;
-use Crossjoin\Css\Format\Rule\PageDeclaration;
 use Crossjoin\Css\Format\Rule\TraitDeclarations;
 use Crossjoin\Css\Format\Rule\AtRuleAbstract;
 use Crossjoin\Css\Format\StyleSheet\StyleSheet;
@@ -15,6 +14,10 @@ extends AtRuleAbstract
 
     protected $selector;
 
+    /**
+     * @param string|null $ruleString
+     * @param StyleSheet|null $styleSheet
+     */
     public function __construct($ruleString = null, StyleSheet $styleSheet = null)
     {
         if ($styleSheet !== null) {
@@ -46,17 +49,30 @@ extends AtRuleAbstract
         return $this->selector;
     }
 
+    /**
+     * Adds a declaration to the rule.
+     *
+     * @param PageDeclaration $declaration
+     * @return $this
+     */
     public function addDeclaration(DeclarationAbstract $declaration)
     {
         if ($declaration instanceof PageDeclaration) {
             $this->declarations[] = $declaration;
         } else {
-            throw new \InvalidArgumentException("Invalid property in declaration for this rule.");
+            throw new \InvalidArgumentException(
+                "Invalid declaration instance. Instance of 'PageDeclaration' expected."
+            );
         }
 
         return $this;
     }
 
+    /**
+     * Parses the page rule.
+     *
+     * @param string $ruleString
+     */
     protected function parseRuleString($ruleString)
     {
         // Remove at-rule name and unnecessary white-spaces

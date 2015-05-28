@@ -1,6 +1,7 @@
 <?php
 namespace Crossjoin\Css\Format\Rule\AtKeyframes;
 
+use Crossjoin\Css\Format\Rule\DeclarationAbstract;
 use Crossjoin\Css\Format\Rule\RuleAbstract;
 use Crossjoin\Css\Format\Rule\TraitDeclarations;
 use Crossjoin\Css\Format\Selector\KeyframesKeyframe;
@@ -80,13 +81,19 @@ extends RuleAbstract
      * @param KeyframesDeclaration $declaration
      * @return $this
      */
-    public function addDeclaration(KeyframesDeclaration $declaration)
+    public function addDeclaration(DeclarationAbstract $declaration)
     {
         // TODO Selectors (or keyframes in this case) do NOT cascade!
         // The last one overwrites previous ones
         // @see: https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes#When_a_keyframe_is_defined_multiple_times
 
-        $this->declarations[] = $declaration;
+        if ($declaration instanceof KeyframesDeclaration) {
+            $this->declarations[] = $declaration;
+        } else {
+            throw new \InvalidArgumentException(
+                "Invalid declaration instance. Instance of 'KeyframesDeclaration' expected."
+            );
+        }
 
         return $this;
     }
