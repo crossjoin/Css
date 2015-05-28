@@ -223,6 +223,7 @@ abstract class ReaderAbstract
         $blockCount = 0;
         $ruleCount = 0;
         $ruleBlock = 0;
+        $inBrackets = false;
         $charsetIgnored = true;
         $charsetReplaced = false;
 
@@ -326,12 +327,19 @@ abstract class ReaderAbstract
                         }
                     } else {
                         if ($char === "@") {
+                        // Start new at-rule, but only if we are not in brackets, which still can occur, although we
+                        // replaced all strings, e.g. in this case: "background: url(/images/myimage-@1x.png)".
+                        if ($char === "@" && $inBrackets === false) {
                             $ruleCount++;
                             $cssContent .= "\n_RULESTART_" . $ruleCount . "_\n";
                         // Replace all white-space characters within rule definitions by normal space to get
                         // only line only
                         } elseif ($ruleCount >= $blockCount && ($char === "\r" || $char === "\n" || $char === "\t" || $char === "\f")) {
                             $char = " ";
+                        } elseif ($char === "(") {
+                            $inBrackets = true;
+                        } elseif ($char === ")") {
+                            $inBrackets = false;
                         }
                         $cssContent .= $char;
                     }
