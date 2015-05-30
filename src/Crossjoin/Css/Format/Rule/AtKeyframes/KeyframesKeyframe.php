@@ -25,7 +25,7 @@ extends SelectorAbstract
     public function checkValue(&$value)
     {
         if (parent::checkValue($value) === true) {
-            if (!preg_match('/^(?:from|to|(?:1)?\d{1,2}%)$/D', $value)) {
+            if (!preg_match('/^(?:from|to|(?:\d{1,2}|100)%)$/D', $value)) {
                 $this->setIsValid(false);
                 $this->addValidationError("Invalid value '$value' for the keyframe selector.");
 

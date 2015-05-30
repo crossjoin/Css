@@ -8,26 +8,6 @@ class KeyframesDeclaration
 extends DeclarationAbstract
 {
     /**
-     * Checks the declaration property.
-     *
-     * @param string $property
-     * @return bool
-     */
-    public function checkProperty(&$property)
-    {
-        if (parent::checkProperty($property)) {
-            if (preg_match('/^(?:from|to|(?:\d{1,2}|100)%)$/D', $property)) {
-                return true;
-            } else {
-                $this->setIsValid(false);
-                $this->addValidationError("Invalid property '$property' for @keyframes declaration.");
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Checks the declaration value.
      *
      * @param string $value
