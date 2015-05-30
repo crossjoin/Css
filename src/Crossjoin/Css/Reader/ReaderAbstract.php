@@ -565,6 +565,10 @@ abstract class ReaderAbstract
                     // New declaration
                     if ($lastRuleSet !== null) {
                         $line = preg_replace('/[\s;]+$/', '', $line);
+
+                        if (strpos($line, ":") === false) {
+                            throw new \RuntimeException("Parse error at '$line'.");
+                        }
                         list($property, $value) = explode(":", $line, 2);
 
                         $declaration = null;
