@@ -156,82 +156,93 @@ extends AtRuleConditionalAbstract
     protected function parseRuleString($ruleString)
     {
         if (is_string($ruleString)) {
-            $charset = $this->getCharset();
+            // Check for valid rule format
+            // (with vendor prefix check to match e.g. "@-moz-document")
+            if (preg_match(
+                '/^[ \r\n\t\f]*@(' . self::getVendorPrefixRegExp("/") . ')?document[ \r\n\t\f]+(.*)$/i',
+                $ruleString,
+                $matches
+            )) {
+                $vendorPrefix = $matches[1];
+                $ruleString = trim($matches[2], " \r\n\t\f");
+                $charset = $this->getCharset();
 
-            // Remove at-rule and unnecessary white-spaces
-            $ruleString = preg_replace('/^[ \r\n\t\f]*@document[ \r\n\t\f]+/i', '', $ruleString);
-            $ruleString = trim($ruleString, " \r\n\t\f");
+                $inFunction = false;
+                $isEscaped = false;
 
-            $inFunction = false;
-            $isEscaped = false;
-
-            $conditions = [];
-            $currentCondition = "";
-            $currentValue  = "";
-            for ($i = 0, $j = mb_strlen($ruleString, $charset); $i < $j; $i++) {
-                $char = mb_substr($ruleString, $i, 1, $charset);
-                if ($char === "\\") {
-                    if ($isEscaped === false) {
-                        $isEscaped = true;
+                $conditions = [];
+                $currentCondition = "";
+                $currentValue  = "";
+                for ($i = 0, $j = mb_strlen($ruleString, $charset); $i < $j; $i++) {
+                    $char = mb_substr($ruleString, $i, 1, $charset);
+                    if ($char === "\\") {
+                        if ($isEscaped === false) {
+                            $isEscaped = true;
+                        } else {
+                            $isEscaped = false;
+                        }
                     } else {
+                        if ($char === "(") {
+                            if ($isEscaped === false) {
+                                $inFunction = true;
+                                continue;
+                            } else {
+                                $currentValue .= $char;
+                            }
+                        } else if ($char === ")") {
+                            if ($isEscaped === false) {
+                                $conditions[$currentCondition] = trim($currentValue, " \r\n\t\f");
+                                $currentCondition = "";
+                                $currentValue = "";
+                                $inFunction = false;
+                                continue;
+                            } else {
+                                $currentValue .= $char;
+                            }
+                        } else if ($char === "," || $char === " ") {
+                            if ($currentCondition === "" && $currentValue === "") {
+                                continue;
+                            } elseif ($currentValue !== "") {
+                                $currentValue .= $char;
+                            } else {
+                                // something wrong here...
+                            }
+                        } else {
+                            if ($inFunction === false) {
+                                $currentCondition .= $char;
+                            } else {
+                                $currentValue .= $char;
+                            }
+                        }
+                    }
+
+                    // Reset escaped flag
+                    if ($isEscaped === true && $char !== "\\") {
                         $isEscaped = false;
                     }
-                } else {
-                    if ($char === "(") {
-                        if ($isEscaped === false) {
-                            $inFunction = true;
-                            continue;
-                        } else {
-                            $currentValue .= $char;
-                        }
-                    } else if ($char === ")") {
-                        if ($isEscaped === false) {
-                            $conditions[$currentCondition] = trim($currentValue, " \r\n\t\f");
-                            $currentCondition = "";
-                            $currentValue = "";
-                            $inFunction = false;
-                            continue;
-                        } else {
-                            $currentValue .= $char;
-                        }
-                    } else if ($char === "," || $char === " ") {
-                        if ($currentCondition === "" && $currentValue === "") {
-                            continue;
-                        } elseif ($currentValue !== "") {
-                            $currentValue .= $char;
-                        } else {
-                            // something wrong here...
-                        }
-                    } else {
-                        if ($inFunction === false) {
-                            $currentCondition .= $char;
-                        } else {
-                            $currentValue .= $char;
-                        }
-                    }
                 }
 
-                // Reset escaped flag
-                if ($isEscaped === true && $char !== "\\") {
-                    $isEscaped = false;
+                foreach ($conditions as $key => $value) {
+                    $conditions[$key] = Placeholder::replaceStringPlaceholders($value, true);
                 }
-            }
 
-            foreach ($conditions as $key => $value) {
-                $conditions[$key] = Placeholder::replaceStringPlaceholders($value, true);
-            }
-
-            if (isset($conditions["url"])) {
-                $this->setUrl($conditions["url"]);
-            }
-            if (isset($conditions["url-prefix"])) {
-                $this->setUrlPrefix($conditions["url-prefix"]);
-            }
-            if (isset($conditions["domain"])) {
-                $this->setDomain($conditions["domain"]);
-            }
-            if (isset($conditions["regexp"])) {
-                $this->setRegexp($conditions["regexp"]);
+                if (isset($conditions["url"])) {
+                    $this->setUrl($conditions["url"]);
+                }
+                if (isset($conditions["url-prefix"])) {
+                    $this->setUrlPrefix($conditions["url-prefix"]);
+                }
+                if (isset($conditions["domain"])) {
+                    $this->setDomain($conditions["domain"]);
+                }
+                if (isset($conditions["regexp"])) {
+                    $this->setRegexp($conditions["regexp"]);
+                }
+                if ($vendorPrefix !== "") {
+                    $this->setVendorPrefix($vendorPrefix);
+                }
+            } else {
+                throw new \InvalidArgumentException("Invalid format for @document rule.");
             }
         } else {
             throw new \InvalidArgumentException(

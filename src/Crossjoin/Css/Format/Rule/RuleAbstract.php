@@ -7,6 +7,7 @@ abstract class RuleAbstract
 {
     use TraitStyleSheet;
     use TraitComments;
+    use TraitVendorPrefix;
     use TraitIsValid {
         setIsValid as protected;
     }

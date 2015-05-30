@@ -17,6 +17,7 @@ use Crossjoin\Css\Format\Rule\AtSupports\SupportsRule;
 use Crossjoin\Css\Format\Rule\HasRulesInterface;
 use Crossjoin\Css\Format\Rule\AtKeyframes\KeyframesDeclaration;
 use Crossjoin\Css\Format\Rule\AtPage\PageDeclaration;
+use Crossjoin\Css\Format\Rule\RuleAbstract;
 use Crossjoin\Css\Format\Rule\Style\StyleRuleSet;
 use Crossjoin\Css\Format\Rule\Style\StyleDeclaration;
 use Crossjoin\Css\Format\StyleSheet\StyleSheet;
@@ -374,12 +375,19 @@ abstract class ReaderAbstract
         $lastRuleContainers = [$this->styleSheet];
         $lastRuleSet = null;
 
+        // Prepare vendor prefix regular expression
+        $vendorPrefixRegExp = RuleAbstract::getVendorPrefixRegExp("/");
+
         $comment = null;
         $atRuleCharsetAllowed = true;
         $atRuleImportAllowed = true;
         $atRuleNamespaceAllowed = true;
         foreach ($lines as $line) {
-            if (preg_match('/^(?J)(?:_(?P<type>RULESTART|RULEEND|BLOCKSTART|BLOCKEND)_\d+_|_(?P<type>COMMENT)_[a-f0-9]{32}_)/', $line, $matches)) {
+            if (preg_match(
+                '/^(?J)(?:_(?P<type>RULESTART|RULEEND|BLOCKSTART|BLOCKEND)_\d+_|_(?P<type>COMMENT)_[a-f0-9]{32}_)/',
+                $line,
+                $matches
+            )) {
                 if ($matches['type'] === 'RULESTART') {
                     $ruleCount++;
                 } elseif ($matches['type'] === 'RULEEND') {
@@ -393,6 +401,7 @@ abstract class ReaderAbstract
                     $blockCount--;
                     if ($blockCount === $ruleCount) {
                         if ($comment !== null) {
+                            /** @var AtRuleAbstract $lastRuleSet */
                             $lastRuleSet->addComment($comment);
                             $comment = null;
                         }
@@ -401,6 +410,7 @@ abstract class ReaderAbstract
                         $lastRuleSet = null;
                     } else {
                         if ($comment !== null) {
+                            /** @var AtRuleAbstract[] $lastRuleContainers */
                             $lastRuleContainers[$ruleCount]->addComment($comment);
                             $comment = null;
                         }
@@ -411,8 +421,12 @@ abstract class ReaderAbstract
             } else {
                 if ($blockCount < $ruleCount) {
                     // New rule opened
-                    if (preg_match('/^@((?:-)?(?:[a-zA-Z_]{1}|[^[:ascii:]{1}])(?:[-a-zA-Z0-9_]*|[^[:ascii:]*]))/i', trim($line), $matches)) {
-                        $identifier = mb_strtolower($matches[1], $this->getCharset());
+                    if (preg_match(
+                        '/^@(' . $vendorPrefixRegExp . ')?([a-zA-Z_]{1}(?:[-a-zA-Z0-9_]*|[^[:ascii:]*]))/i',
+                        trim($line),
+                        $matches
+                    )) {
+                        $identifier   = mb_strtolower($matches[2], $this->getCharset());
                         switch($identifier) {
                             case "charset":
                                 $atRule = new CharsetRule($line, $this->styleSheet);
@@ -443,6 +457,12 @@ abstract class ReaderAbstract
                                 break;
                             default:
                                 throw new \InvalidArgumentException("Unknown at rule identifier '$identifier'.");
+                        }
+
+                        // Add vendor prefix
+                        if ($matches[1] !== "") {
+                            $vendorPrefix = mb_strtolower($matches[1], $this->getCharset());
+                            $atRule->setVendorPrefix($vendorPrefix);
                         }
                     } else {
                         throw new \InvalidArgumentException("Invalid rule format in '$line'.");

@@ -92,9 +92,19 @@ implements HasRulesInterface
     protected function parseRuleString($ruleString)
     {
         if (is_string($ruleString)) {
-            if (preg_match('/^@keyframes[ \r\n\t\f]+([^ \r\n\t\f]+)[ \r\n\t\f]*/i', $ruleString, $matches)) {
-                $identifier = $matches[1];
+            // Check for valid rule format
+            // (with vendor prefix check to match e.g. "@-webkit-keyframes")
+            if (preg_match(
+                '/^[ \r\n\t\f]*@(' . self::getVendorPrefixRegExp("/") . ')?keyframes[ \r\n\t\f]+([^ \r\n\t\f]+)[ \r\n\t\f]*/i',
+                $ruleString,
+                $matches
+            )) {
+                $vendorPrefix = $matches[1];
+                $identifier = $matches[2];
                 $this->setIdentifier($identifier, $this->getStyleSheet());
+                if ($vendorPrefix !== "") {
+                    $this->setVendorPrefix($vendorPrefix);
+                }
             } else {
                 throw new \InvalidArgumentException("Invalid format for @keyframes rule.");
             }

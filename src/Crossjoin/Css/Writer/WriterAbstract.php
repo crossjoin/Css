@@ -86,11 +86,11 @@ abstract class WriterAbstract
             if ($rule instanceof CharsetRule) {
                 // @charset must be at the beginning of the content
                 if ($content === "") {
-                    $content .= "@charset \"" . $rule->getValue() . "\";" . $options["CharsetLineBreak"];
+                    $content .= "@" . ((string)$rule->getVendorPrefix()) . "charset \"" . $rule->getValue() . "\";" . $options["CharsetLineBreak"];
                 }
             } elseif ($rule instanceof ImportRule) {
                 $content .= $options["BaseIntend"];
-                $content .= "@import ";
+                $content .= "@" . ((string)$rule->getVendorPrefix()) . "import ";
                 $content .= "url(\"" . Url::escapeUrl($rule->getUrl()) . "\")";
 
                 $mediaQueryConcat = "";
@@ -125,7 +125,7 @@ abstract class WriterAbstract
                 $content .= ";" . $options["ImportLineBreak"];
             } elseif ($rule instanceof NamespaceRule) {
                 $content .= $options["BaseIntend"];
-                $content .= "@namespace";
+                $content .= "@" . ((string)$rule->getVendorPrefix()) . "namespace";
                 $prefix = $rule->getPrefix();
                 if (!empty($prefix)) {
                     $content .= " " . $prefix;
@@ -135,7 +135,7 @@ abstract class WriterAbstract
             } elseif ($rule instanceof DocumentRule) {
                 // Prepare rule start content
                 $ruleStartContent = $options["BaseIntend"];
-                $ruleStartContent .= "@document";
+                $ruleStartContent .= "@" . ((string)$rule->getVendorPrefix()) . "document";
 
                 // Prepare rule filter content
                 $concat = " ";
@@ -172,7 +172,7 @@ abstract class WriterAbstract
             } elseif ($rule instanceof FontFaceRule) {
                 // Prepare rule start content
                 $ruleStartContent = $options["BaseIntend"];
-                $ruleStartContent .= "@font-face";
+                $ruleStartContent .= "@" . ((string)$rule->getVendorPrefix()) . "font-face";
                 $ruleStartContent .= $options["FontFaceRuleSetOpen"];
 
                 // Prepare rule declarations content
@@ -206,7 +206,7 @@ abstract class WriterAbstract
             } elseif ($rule instanceof KeyframesRule) {
                 // Prepare rule content
                 $ruleStartContent = $options["BaseIntend"];
-                $ruleStartContent .= "@keyframes " ;
+                $ruleStartContent .= "@" . ((string)$rule->getVendorPrefix()) . "keyframes " ;
                 $ruleStartContent .= $rule->getIdentifier();
                 $ruleStartContent .= $options["KeyframesRuleSetOpen"];
                 $ruleRulesContent = $this->getRulesContent($rule->getRules(), $level + 1);
@@ -220,7 +220,7 @@ abstract class WriterAbstract
             } elseif ($rule instanceof MediaRule) {
                 // Prepare rule content
                 $ruleStartContent = $options["BaseIntend"];
-                $ruleStartContent .= "@media";
+                $ruleStartContent .= "@" . ((string)$rule->getVendorPrefix()) . "media";
                 $mediaQueryConcat = " ";
                 foreach ($rule->getQueries() as $mediaQuery) {
                     $ruleStartContent .= $mediaQueryConcat;
@@ -261,7 +261,7 @@ abstract class WriterAbstract
                 }
             } elseif ($rule instanceof PageRule) {
                 $content .= $options["BaseIntend"];
-                $content .= "@page";
+                $content .= "@" . ((string)$rule->getVendorPrefix()) . "page";
 
                 $selector = $rule->getSelector()->getValue();
                 if ($selector !== PageSelector::SELECTOR_ALL) {
@@ -292,7 +292,7 @@ abstract class WriterAbstract
             } elseif ($rule instanceof SupportsRule) {
                 // Prepare rule content
                 $ruleStartContent = $options["BaseIntend"];
-                $ruleStartContent .= "@supports ";
+                $ruleStartContent .= "@" . ((string)$rule->getVendorPrefix()) . "supports ";
                 $conditions = $rule->getConditions();
                 if (count($conditions) > 0) {
                     $ruleStartContent .= "(";
