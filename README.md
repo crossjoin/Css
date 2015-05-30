@@ -44,7 +44,7 @@ $reader = new \Crossjoin\Css\Reader\HtmlFile($htmlFileName);
 
 // Extract CSS from <style> tags in a HTML string
 // (multiple tags are merges to one style sheet)
-$htmlString = "<html><head><style>body { background:red; }</style></head><body></body></html>";
+$htmlString = "<html><head><style>body{color:red;}</style></head><body></body></html>";
 $reader = new \Crossjoin\Css\Reader\HtmlFile($htmlString);
 ```
 
@@ -66,7 +66,8 @@ The writer can create CSS in different formats.
 $writer = new \Crossjoin\Css\Writer\Compact($reader->getStyleSheet());
 $cssContent = $writer->getContent();
 
-// Gets the CSS content in prettified format (with comments, line breaks, indentations,...)
+// Gets the CSS content in prettified format
+// (with comments, line breaks, indentations,...)
 $writer = new \Crossjoin\Css\Writer\Pretty($reader->getStyleSheet());
 $cssContent = $writer->getContent();
 ```
