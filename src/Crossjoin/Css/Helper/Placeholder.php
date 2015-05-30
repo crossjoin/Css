@@ -35,6 +35,20 @@ class Placeholder
                 $text = preg_replace_callback('/("|\')(.*?)\g{1}/', $replaceStringCallback, $text);
             }
 
+            if (strpos($text, "data:") !== false) {
+                // Replace all data URIs
+                // (that are not in quotes and therefor were not replaced by the previous check)
+                $replaceDataUriCallback = function ($matches) {
+                    return self::addStringReplacement($matches[1]);
+                };
+                $text = preg_replace_callback(
+                    '/(data:(?:[^;,]+)?(?:;charset=[^;,]+)?' .
+                    '(?:;base64,(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?|,[-.a-zA-Z0-9_%]+))/',
+                    $replaceDataUriCallback,
+                    $text
+                );
+            }
+
             // Fast pre-check, to optimize performance
             if (strpos($text, "*") !== false) {
                 // Strip multi-line comments (after string replace to keep comments in strings)
