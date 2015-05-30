@@ -115,7 +115,7 @@ abstract class WriterAbstract
                         foreach ($conditions as $condition) {
                             if ($condition->getIsValid() === true) {
                                 $content .= $mediaConditionConcat . $condition->getValue();
-                                $mediaConditionConcat = " and ";
+                                $mediaConditionConcat = ") and (";
                             }
                         }
                         $content .= ")";
