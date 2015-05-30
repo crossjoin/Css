@@ -191,7 +191,7 @@ extends AtRuleConditionalAbstract
      */
     protected function getQueryInstanceFromQueryString($queryString)
     {
-        if (preg_match('/^[ \r\n\t\f]*(?:(only[ \r\n\t\f]+)|(not[ \r\n\t\f]+))?([^ \r\n\t\f]*)[ \r\n\t\f]*(?:and)?[ \r\n\t\f]*$/iD', $queryString, $matches)) {
+        if (preg_match('/^[ \r\n\t\f]*(?:(only[ \r\n\t\f]+)|(not[ \r\n\t\f]+))?([^ \r\n\t\f]*)[ \r\n\t\f]*(?:(?:and)?[ \r\n\t\f]*)*$/iD', $queryString, $matches)) {
             $type = $matches[3] === "" ? MediaQuery::TYPE_ALL : $matches[3];
             $query = new MediaQuery($type);
             if (!empty($matches[1])) {

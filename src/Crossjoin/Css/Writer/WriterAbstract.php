@@ -243,7 +243,7 @@ abstract class WriterAbstract
                         foreach ($conditions as $condition) {
                             if ($condition->getIsValid() === true) {
                                 $ruleStartContent .= $mediaConditionConcat . $condition->getValue();
-                                $mediaConditionConcat = " and ";
+                                $mediaConditionConcat = ") and (";
                             }
                         }
                         $ruleStartContent .= ")";
