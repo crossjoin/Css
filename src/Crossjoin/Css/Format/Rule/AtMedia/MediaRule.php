@@ -83,7 +83,7 @@ extends AtRuleConditionalAbstract
             $charset = $this->getCharset();
 
             // Remove at-rule and unnecessary white-spaces
-            $ruleString = preg_replace('/^[ \r\n\t\f]*@media[ \r\n\t\f]+/i', '', $ruleString);
+            $ruleString = preg_replace('/^[ \r\n\t\f]*@media[ \r\n\t\f]*/i', '', $ruleString);
             $ruleString = trim($ruleString, " \r\n\t\f");
 
             $groupsOpened = 0;
