@@ -88,8 +88,9 @@ print_r($content);
 print_r($errors);
 // Array (
 // [0] => Ignored @charset rule, because at wrong position in style sheet.
-// [1] => Rule instance of type 'Crossjoin\Css\Format\Rule\AtPage\PageRule' not allowed
-//        in conditional group rule of type 'Crossjoin\Css\Format\Rule\AtMedia\MediaRule'.
+// [1] => Rule instance of type 'Crossjoin\Css\Format\Rule\AtPage\PageRule'
+//        not allowed in conditional group rule of type
+//        'Crossjoin\Css\Format\Rule\AtMedia\MediaRule'.
 // [2] => Empty media at-rule '@media print' ignored.
 // )
 ```
