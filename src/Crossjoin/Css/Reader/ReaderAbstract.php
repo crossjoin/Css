@@ -330,11 +330,17 @@ abstract class ReaderAbstract
                         // Start new at-rule, but only if we are not in brackets, which still can occur, although we
                         // replaced all strings, e.g. in this case: "background: url(/images/myimage-@1x.png)".
                         if ($char === "@" && $inBrackets === false) {
+                            if ($ruleCount > 0 && $blockCount === 0) {
+                                $errorCss = Placeholder::replaceCommentPlaceholders(
+                                    Placeholder::replaceStringPlaceholders($css)
+                                );
+                                throw new \RuntimeException("Parse error near '$errorCss'.");
+                            }
                             $ruleCount++;
                             $cssContent .= "\n_RULESTART_" . $ruleCount . "_\n";
                         // Replace all white-space characters within rule definitions by normal space to get
-                        // only line only
-                        } elseif ($ruleCount >= $blockCount && ($char === "\r" || $char === "\n" || $char === "\t" || $char === "\f")) {
+                        // one line only
+                        } elseif ($ruleCount >= $blockCount && in_array($char, ["\r", "\n", "\t", "\f"])) {
                             $char = " ";
                         } elseif ($char === "(") {
                             $inBrackets = true;
