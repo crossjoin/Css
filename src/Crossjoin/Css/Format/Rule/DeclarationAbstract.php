@@ -9,9 +9,7 @@ abstract class DeclarationAbstract
 {
     use TraitStyleSheet;
     use TraitComments;
-    use TraitIsValid {
-        setIsValid as protected;
-    }
+    use TraitIsValid;
 
     /**
      * @var string Declaration property
