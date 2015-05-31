@@ -72,6 +72,28 @@ $writer = new \Crossjoin\Css\Writer\Pretty($reader->getStyleSheet());
 $cssContent = $writer->getContent();
 ```
 
+###Error handling
+While parsing the CSS source, the content is checked for invalid rules, selectors and declarations. Furthermore the reader and the writer do additional checks regarding the composition of the rules, e.g. invalid rule positions or unnecessary empty rules.
+
+```php
+$cssString = 'body{color:black} @charset "UTF-8"; @media print{@page{margin:1cm;}}';
+$reader = new \Crossjoin\Css\Reader\CssString($cssString);
+$writer = new \Crossjoin\Css\Writer\Pretty($reader->getStyleSheet());
+$content = $writer->getContent();
+$errors = $writer->getErrors();
+
+print_r($content);
+// body { color: black; }
+
+print_r($errors);
+// Array (
+// [0] => Ignored @charset rule, because at wrong position in style sheet.
+// [1] => Rule instance of type 'Crossjoin\Css\Format\Rule\AtPage\PageRule' not allowed
+//        in conditional group rule of type 'Crossjoin\Css\Format\Rule\AtMedia\MediaRule'.
+// [2] => Empty media at-rule '@media print' ignored.
+// )
+```
+
 ##Advanced usage
 TODO
 
