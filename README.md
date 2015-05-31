@@ -1,7 +1,7 @@
 #CSS reader and writer
 
 ##Introduction
-Crossjoin\Css can read CSS from different sources and write it in different formats. It supports different at-rules like media queries, comments, value optimization, and already supports parts of CSS4.
+CSS reader and writer with full CSS3 support, already supporting huge parts of the current CSS4 spec. It supports media queries, comments, value optimization and more... It offers full Unicode support and can handle also large CSS sources.
 
 ##Installation
 This is a composer package. See the [composer website](https://getcomposer.org/) for basic installation information.
@@ -15,11 +15,18 @@ Add the following line to your `composer.json` file:
 }
 ```
 
+###Requirements
+- PHP 5.4+
+- Multibyte String (mbstring) extension
+- DOM extension (to extract CSS from HTML sources)
+
 ##Features
-- Supports nearly all at-rules with unlimited level of nesting
-- Can read CSS4 media queries (are converted to CSS3 media queries)
-- Can handle large, compressed CSS files
+- Full CSS3 support
+- Full Unicode support
+- Support for huge parts of CSS4
+- Supports at-rules with an unlimited level of nesting
 - Supports CSS comments
+- Can handle large, compressed CSS files
 - Integrated checks for invalid CSS
 - ...
 
