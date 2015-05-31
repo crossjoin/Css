@@ -264,20 +264,23 @@ abstract class WriterAbstract
                 $ruleStartContent = $options["BaseIntend"];
                 $ruleStartContent .= "@" . ((string)$rule->getVendorPrefix()) . "media";
                 $mediaQueryConcat = " ";
+                $ignoreAllType = true;
                 foreach ($rule->getQueries() as $mediaQuery) {
                     $ruleStartContent .= $mediaQueryConcat;
                     if ($mediaQuery->getIsOnly() === true) {
                         $ruleStartContent .= "only ";
+                        $ignoreAllType = false;
                     } elseif ($mediaQuery->getIsNot() === true) {
                         $ruleStartContent .= "not ";
+                        $ignoreAllType = false;
                     }
 
-                    if ($mediaQuery->getType() !== MediaQuery::TYPE_ALL) {
+                    if ($ignoreAllType === false || $mediaQuery->getType() !== MediaQuery::TYPE_ALL) {
                         $ruleStartContent .= $mediaQuery->getType();
                     }
                     $conditions = $mediaQuery->getConditions();
                     if (count($conditions) > 0) {
-                        if ($mediaQuery->getType() !== MediaQuery::TYPE_ALL) {
+                        if ($ignoreAllType === false || $mediaQuery->getType() !== MediaQuery::TYPE_ALL) {
                             $ruleStartContent .= " and ";
                         }
                         $ruleStartContent .= "(";
@@ -296,6 +299,7 @@ abstract class WriterAbstract
                         $ruleStartContent .= ")";
                     }
                     $mediaQueryConcat = $options["MediaQuerySeparator"];
+                    $ignoreAllType = false;
                 }
                 $ruleRulesContent = $this->getRulesContent($rule->getRules(), $level + 1);
 
