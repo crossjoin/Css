@@ -101,5 +101,6 @@ TODO
 ##To Do
 - Additional checks for valid CSS rules, properties and values
 - Additional optimizations of CSS properties and values
+- Optimized auto-correction of invalid CSS, following the specs ([example](http://dev.w3.org/csswg/mediaqueries-4/#error-handling))
 - Support for [CSS Paged Media Module Level 3](http://dev.w3.org/csswg/css-page-3/#at-page-rule) (page type selectors, margin at-rules)
 - Support for "supports" in import at-rule ([not final](http://dev.w3.org/csswg/css-cascade-4/#at-ruledef-import))
