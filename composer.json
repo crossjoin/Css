@@ -1,6 +1,6 @@
 {
     "name": "crossjoin/css",
-    "description": "Crossjoin\\Css can read CSS from different sources and write it in different formats. It supports different at-rules like @media queries, comments, value optimization, and already supports parts of CSS4. Requires PHP 5.4+.",
+    "description": "CSS reader and writer with full CSS3 support, already supporting huge parts of the current CSS4 spec. It supports media queries, comments, value optimization and more... It offers full Unicode support and can handle also large CSS sources. Requires PHP 5.4+.",
     "keywords": ["css", "css parser", "css reader", "css writer", "php"],
     "homepage": "https://github.com/crossjoin/Css",
     "license": "MIT",
