@@ -561,6 +561,7 @@ abstract class ReaderAbstract
                     }
                     $lastRuleContainers[$ruleCount]->addRule($ruleSet);
                     $lastRuleSet = $ruleSet;
+                    $atRuleCharsetAllowed = false;
                 } elseif ($blockCount >= $ruleCount) {
                     // New declaration
                     if ($lastRuleSet !== null) {
@@ -592,6 +593,7 @@ abstract class ReaderAbstract
                             $lastRuleSet->addDeclaration($declaration);
                         }
                     }
+                    $atRuleCharsetAllowed = false;
                 }
             }
         }
