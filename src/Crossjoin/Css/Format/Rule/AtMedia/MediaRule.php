@@ -165,13 +165,26 @@ extends AtRuleConditionalAbstract
                     }
                 }
             }
-            foreach ($currentQueries as $currentQuery) {
-                $query = $this->getQueryInstanceFromQueryString($currentQuery);
-                if ($query !== null) {
-                    if (count($currentConditions) > 0) {
-                        $query->setConditions($currentConditions);
+            if ($groupsOpened > 0) {
+                // Handle unclosed parenthesis following the spec:
+                // "Because the parenthesized block is unclosed, it will contain the entire rest of the stylesheet
+                // from that point (unless it happens to encounter an unmatched ')' character somewhere in the
+                // stylesheet), and turn the entire thing into a not all media query."
+                $this->setIsValid(false);
+                $this->addValidationError("Parse error. Unclosed parenthesis at '$ruleString'.");
+
+                $query = new MediaQuery(MediaQuery::TYPE_ALL);
+                $query->setIsNot(true);
+                $queries[] = $query;
+            } else {
+                foreach ($currentQueries as $currentQuery) {
+                    $query = $this->getQueryInstanceFromQueryString($currentQuery);
+                    if ($query !== null) {
+                        if (count($currentConditions) > 0) {
+                            $query->setConditions($currentConditions);
+                        }
+                        $queries[] = $query;
                     }
-                    $queries[] = $query;
                 }
             }
 
