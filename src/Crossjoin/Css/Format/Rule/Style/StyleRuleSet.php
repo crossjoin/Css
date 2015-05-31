@@ -104,6 +104,14 @@ implements RuleGroupableInterface
     {
         foreach ($this->getSelectorStrings($ruleString) as $selectorString)
         {
+            // Check for invalid selector (e.g. if starting with a comma, like in this example from
+            // the spec ",all { body { background:lime } }")
+            if ($selectorString === "") {
+                $this->setIsValid(false);
+                $this->addValidationError("Invalid selector at '$ruleString'.");
+                break;
+            }
+
             $this->addSelector(new StyleSelector($selectorString, $this->getStyleSheet()));
         }
     }
