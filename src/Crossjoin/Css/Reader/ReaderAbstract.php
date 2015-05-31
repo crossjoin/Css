@@ -573,10 +573,14 @@ abstract class ReaderAbstract
                     if ($lastRuleSet !== null) {
                         $line = preg_replace('/[\s;]+$/', '', $line);
 
+                        $invalidDeclaration = false;
                         if (strpos($line, ":") === false) {
-                            throw new \RuntimeException("Parse error at '$line'.");
+                            $property = $line;
+                            $value = "";
+                            $invalidDeclaration = true;
+                        } else {
+                            list($property, $value) = explode(":", $line, 2);
                         }
-                        list($property, $value) = explode(":", $line, 2);
 
                         $declaration = null;
                         if ($lastRuleContainers[$ruleCount] instanceof StyleSheet) {
@@ -595,6 +599,10 @@ abstract class ReaderAbstract
                             if ($comment !== null) {
                                 $declaration->addComment($comment);
                                 $comment = null;
+                            }
+                            if ($invalidDeclaration === true) {
+                                $declaration->setIsValid(false);
+                                $declaration->addValidationError("Parse error. Invalid declaration at '$line'.");
                             }
                             $lastRuleSet->addDeclaration($declaration);
                         }
