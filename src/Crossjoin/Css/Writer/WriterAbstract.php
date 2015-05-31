@@ -27,6 +27,9 @@ abstract class WriterAbstract
 {
     use TraitStyleSheet;
 
+    protected $content;
+    protected $errorMessages;
+
     /**
      * @param StyleSheet $styleSheet
      */
@@ -42,9 +45,25 @@ abstract class WriterAbstract
      */
     public function getContent()
     {
-        $rules = $this->getStyleSheet()->getRules();
+        if ($this->content === null) {
+            $this->getRulesContent();
+        }
 
-        return $this->getRulesContent($rules);
+        return $this->content;
+    }
+
+    /**
+     * Gets the error messages for the generated CSS content.
+     *
+     * @return string[]
+     */
+    public function getErrors()
+    {
+        if ($this->errorMessages === null) {
+            $this->getRulesContent();
+        }
+
+        return $this->errorMessages;
     }
 
     /**
@@ -62,8 +81,13 @@ abstract class WriterAbstract
      * @param int $level
      * @return string
      */
-    protected function getRulesContent(array $rules, $level = 0)
+    protected function getRulesContent(array $rules = null, $level = 0)
     {
+        if ($level === 0) {
+            $rules = $this->getStyleSheet()->getRules();
+            $this->errorMessages = [];
+        }
+
         // Get format options
         $options = $this->getOptions($level);
 
@@ -80,6 +104,10 @@ abstract class WriterAbstract
 
             // Skip invalid rules
             if ($rule->getIsValid() === false) {
+                // Copy error to the writer
+                foreach ($rule->getValidationErrors() as $validationError) {
+                    $this->errorMessages[] = $validationError;
+                }
                 continue;
             }
 
@@ -116,6 +144,11 @@ abstract class WriterAbstract
                             if ($condition->getIsValid() === true) {
                                 $content .= $mediaConditionConcat . $condition->getValue();
                                 $mediaConditionConcat = ") and (";
+                            } else {
+                                // Copy error to the writer
+                                foreach ($condition->getValidationErrors() as $validationError) {
+                                    $this->errorMessages[] = $validationError;
+                                }
                             }
                         }
                         $content .= ")";
@@ -158,7 +191,6 @@ abstract class WriterAbstract
                 if (!empty($regexp)) {
                     $ruleStartContent .= $concat . "regexp($regexp)";
                 }
-                $ruleStartContent .= $options["DocumentRuleSetOpen"];
 
                 // Prepare rule content
                 $ruleRuleContent = $this->getRulesContent($rule->getRules(), $level + 1);
@@ -166,8 +198,11 @@ abstract class WriterAbstract
                 // Only add the content if valid rules set
                 if ($ruleRuleContent !== "") {
                     $content .= $ruleStartContent;
+                    $content .= $options["DocumentRuleSetOpen"];
                     $content .= $ruleRuleContent;
                     $content .= $options["DocumentRuleSetClose"];
+                } else {
+                    $this->errorMessages[] = "Empty document at-rule '$ruleStartContent' ignored.";
                 }
             } elseif ($rule instanceof FontFaceRule) {
                 // Prepare rule start content
@@ -196,6 +231,11 @@ abstract class WriterAbstract
                             $content .= ";";
                         }
                         $content .= $options["FontFaceDeclarationLineBreak"];
+                    } else {
+                        // Copy error to the writer
+                        foreach ($declarations[$i]->getValidationErrors() as $validationError) {
+                            $this->errorMessages[] = $validationError;
+                        }
                     }
                 }
 
@@ -208,14 +248,16 @@ abstract class WriterAbstract
                 $ruleStartContent = $options["BaseIntend"];
                 $ruleStartContent .= "@" . ((string)$rule->getVendorPrefix()) . "keyframes " ;
                 $ruleStartContent .= $rule->getIdentifier();
-                $ruleStartContent .= $options["KeyframesRuleSetOpen"];
                 $ruleRulesContent = $this->getRulesContent($rule->getRules(), $level + 1);
 
                 // Only add the content if valid rules set
                 if ($ruleRulesContent !== "") {
                     $content .= $ruleStartContent;
+                    $content .= $options["KeyframesRuleSetOpen"];
                     $content .= $ruleRulesContent;
                     $content .= $options["KeyframesRuleSetClose"];
+                } else {
+                    $this->errorMessages[] = "Empty keyframes at-rule '$ruleStartContent' ignored.";
                 }
             } elseif ($rule instanceof MediaRule) {
                 // Prepare rule content
@@ -244,20 +286,27 @@ abstract class WriterAbstract
                             if ($condition->getIsValid() === true) {
                                 $ruleStartContent .= $mediaConditionConcat . $condition->getValue();
                                 $mediaConditionConcat = ") and (";
+                            } else {
+                                // Copy error to the writer
+                                foreach ($condition->getValidationErrors() as $validationError) {
+                                    $this->errorMessages[] = $validationError;
+                                }
                             }
                         }
                         $ruleStartContent .= ")";
                     }
                     $mediaQueryConcat = $options["MediaQuerySeparator"];
                 }
-                $ruleStartContent .= $options["MediaRuleSetOpen"];
                 $ruleRulesContent = $this->getRulesContent($rule->getRules(), $level + 1);
 
                 // Only add the content if valid rules set
                 if ($ruleRulesContent !== "") {
                     $content .= $ruleStartContent;
+                    $content .= $options["MediaRuleSetOpen"];
                     $content .= $ruleRulesContent;
                     $content .= $options["MediaRuleSetClose"];
+                } else {
+                    $this->errorMessages[] = "Empty media at-rule '$ruleStartContent' ignored.";
                 }
             } elseif ($rule instanceof PageRule) {
                 $content .= $options["BaseIntend"];
@@ -285,6 +334,11 @@ abstract class WriterAbstract
                             $content .= ";";
                         }
                         $content .= $options["PageDeclarationLineBreak"];
+                    } else {
+                        // Copy error to the writer
+                        foreach ($declarations[$i]->getValidationErrors() as $validationError) {
+                            $this->errorMessages[] = $validationError;
+                        }
                     }
                 }
 
@@ -301,18 +355,25 @@ abstract class WriterAbstract
                         if ($condition->getIsValid() === true) {
                             $ruleStartContent .= $supportConditionConcat . $condition->getValue();
                             $supportConditionConcat = ") and (";
+                        } else {
+                            // Copy error to the writer
+                            foreach ($condition->getValidationErrors() as $validationError) {
+                                $this->errorMessages[] = $validationError;
+                            }
                         }
                     }
                     $ruleStartContent .= ")";
                 }
-                $ruleStartContent .= $options["SupportsRuleSetOpen"];
                 $ruleRulesContent = $this->getRulesContent($rule->getRules(), $level + 1);
 
                 // Only add the content if valid rules set
                 if ($ruleRulesContent !== "") {
                     $content .= $ruleStartContent;
+                    $content .= $options["SupportsRuleSetOpen"];
                     $content .= $ruleRulesContent;
                     $content .= $options["SupportsRuleSetClose"];
+                } else {
+                    $this->errorMessages[] = "Empty supports at-rule '$ruleStartContent' ignored.";
                 }
             } elseif ($rule instanceof StyleRuleSet) {
                 // Prepare rule content
@@ -323,6 +384,11 @@ abstract class WriterAbstract
                     if ($selector->getIsValid() === true) {
                         $ruleSelectorContent .= $concat . $selector->getValue();
                         $concat = $options["StyleSelectorSeparator"];
+                    } else {
+                        // Copy error to the writer
+                        foreach ($selector->getValidationErrors() as $validationError) {
+                            $this->errorMessages[] = $validationError;
+                        }
                     }
                 }
 
@@ -350,6 +416,11 @@ abstract class WriterAbstract
                                 $ruleDeclarationContent .= ";";
                             }
                             $ruleDeclarationContent .= $options["StyleDeclarationLineBreak"];
+                        } else {
+                            // Copy error to the writer
+                            foreach ($declarations[$i]->getValidationErrors() as $validationError) {
+                                $this->errorMessages[] = $validationError;
+                            }
                         }
                     }
 
@@ -358,6 +429,8 @@ abstract class WriterAbstract
                         $content .= $ruleStartContent;
                         $content .= $ruleDeclarationContent;
                         $content .= $options["StyleDeclarationsClose"];
+                    } else {
+                        $this->errorMessages[] = "Empty style rule set '$ruleSelectorContent' ignored.";
                     }
                 }
             } elseif ($rule instanceof KeyframesRuleSet) {
@@ -369,6 +442,11 @@ abstract class WriterAbstract
                     if ($keyframe->getIsValid() === true) {
                         $ruleSelectorContent .= $concat . $keyframe->getValue();
                         $concat = $options["KeyframesSelectorSeparator"];
+                    } else {
+                        // Copy error to the writer
+                        foreach ($keyframe->getValidationErrors() as $validationError) {
+                            $this->errorMessages[] = $validationError;
+                        }
                     }
                 }
 
@@ -388,6 +466,11 @@ abstract class WriterAbstract
                                 $ruleDeclarationContent .= ";";
                             }
                             $ruleDeclarationContent .= $options["KeyframesDeclarationLineBreak"];
+                        } else {
+                            // Copy error to the writer
+                            foreach ($declarations[$i]->getValidationErrors() as $validationError) {
+                                $this->errorMessages[] = $validationError;
+                            }
                         }
                     }
 
@@ -396,9 +479,16 @@ abstract class WriterAbstract
                         $content .= $ruleStartContent;
                         $content .= $ruleDeclarationContent;
                         $content .= $options["KeyframesDeclarationsClose"];
+                    } else {
+                        $this->errorMessages[] = "Empty keyframes rule set '$ruleSelectorContent' ignored.";
                     }
                 }
             }
+        }
+
+        // Save complete style sheet content in property
+        if ($level === 0) {
+            $this->content = $content;
         }
 
         return $content;
