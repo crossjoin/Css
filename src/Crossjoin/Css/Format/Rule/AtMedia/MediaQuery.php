@@ -64,7 +64,11 @@ class MediaQuery
 
                 return $this;
             } else {
-                throw new \InvalidArgumentException("Invalid value '$type' for argument 'type' given.");
+                // Invalid type values have to be handled as "not all"
+                // @see: http://dev.w3.org/csswg/mediaqueries-4/#error-handling
+                $this->type = self::TYPE_ALL;
+                $this->setIsNot(true);
+                $this->setIsOnly(false);
             }
         } else {
             throw new \InvalidArgumentException(
