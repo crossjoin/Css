@@ -10,7 +10,7 @@ Add the following line to your `composer.json` file:
 ```javascript
 {
     "require": {
-        "crossjoin/css": "dev-master"
+        "crossjoin/css": "1.0.*"
     }
 }
 ```
