@@ -24,10 +24,5 @@
         "psr-4": {
             "Crossjoin\\Css\\": "src/Crossjoin/Css/"
         }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
-        }
     }
 }
