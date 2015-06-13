@@ -28,7 +28,7 @@ extends DeclarationAbstract
                 $charset = $this->getStyleSheet()->getCharset();
                 if (mb_strtolower(mb_substr($value, -10, null, $charset), $charset) === "!important") {
                     $this->setIsImportant(true);
-                    $value = mb_substr($value, 0, -11, $charset);
+                    $value = rtrim(mb_substr($value, 0, -10, $charset));
                 }
             }
 
