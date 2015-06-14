@@ -188,6 +188,11 @@ extends AtRuleConditionalAbstract
                 }
             }
 
+            // If not query set, default to type "all"
+            if (count($queries) === 0) {
+                $queries[] = new MediaQuery(MediaQuery::TYPE_ALL);
+            }
+
             $this->setQueries($queries);
         } else {
             throw new \InvalidArgumentException(
