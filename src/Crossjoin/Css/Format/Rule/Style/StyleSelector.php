@@ -193,6 +193,7 @@ extends SelectorAbstract
                 // Filter user-defined strings, that can contain special characters, comments etc.
                 // and therefore need to be ignored.
                 if ($inAttribute === false && $wasEscaped === false && $char === "[") {
+                    $countAttributeSelectors++;
                     $inAttribute = true;
                     continue;
                 } else {
@@ -313,23 +314,18 @@ extends SelectorAbstract
                             $inSelectorPart = true;
                         }
                     } else {
-                        if ($char === "[") {
-                            $countAttributeSelectors++;
+                        if ($char === "*") {
+                            $countUniversalSelectors++;
                             $inSelectorPart = true;
                         } else {
-                            if ($char === "*") {
-                                $countUniversalSelectors++;
-                                $inSelectorPart = true;
+                            if ($char === "+" || $char === ">" || $char === "~" || /*preg_match('/\s/', $char)*/
+                                $char === " " || $char === "\t" || $char === "\f"
+                            ) {
+                                $inSelectorPart = false;
                             } else {
-                                if ($char === "+" || $char === ">" || $char === "~" || /*preg_match('/\s/', $char)*/
-                                    $char === " " || $char === "\t" || $char === "\f"
-                                ) {
-                                    $inSelectorPart = false;
-                                } else {
-                                    if ($inSelectorPart === false) {
-                                        $countTypeSelectors++;
-                                        $inSelectorPart = true;
-                                    }
+                                if ($inSelectorPart === false) {
+                                    $countTypeSelectors++;
+                                    $inSelectorPart = true;
                                 }
                             }
                         }
